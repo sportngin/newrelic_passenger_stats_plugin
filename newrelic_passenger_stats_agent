@@ -1,0 +1,49 @@
+#! /usr/bin/env ruby
+
+require "rubygems"
+require "bundler/setup"
+
+require "newrelic_plugin"
+
+module PassengerStatsAgent
+
+  class Agent < NewRelic::Plugin::Agent::Base
+
+    agent_guid "com.sportngin.passenger-stats-agent"
+    agent_version "0.0.1"
+    agent_config_options :app_name, :ssh_command, :passenger_status_command, :app_hostnames
+    agent_human_labels("Passenger Stats") { "Passenger Stats for #{app_name}" }
+
+    def setup_metrics
+
+    end
+
+    def poll_cycle
+      options = {
+        :ssh_command => ssh_command,
+        :passenger_status_command => passenger_status_command,
+        :passenger_memory_stats_command => passenger_memory_stats_command,
+        :app_hostnames => app_hostnames,
+      }
+      aggregator = PassengerStatusAggregator.new(options)
+      record_passenger_status_metrics(aggregator)
+    end
+
+    private
+
+    def record_passenger_status_metrics(stats)
+      report_metric "passenger.processes.max", "Processes", aggregator.stats[:max]
+      report_metric "passenger.processes.booted", "Processes", aggregator.stats[:booted]
+      report_metric "passenger.processes.active", "Processes", aggregator.stats[:active]
+      report_metric "passenger.queue.waiting", "Requests", aggregator.stats[:queued]
+    end
+
+  end
+
+  # Register this agent with the component.
+  NewRelic::Plugin::Setup.install_agent :passenger_stats, PassengerStatsAgent
+
+  # Launch the agent; this never returns.
+  NewRelic::Plugin::Run.setup_and_run
+
+end
