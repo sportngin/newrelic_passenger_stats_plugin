@@ -19,7 +19,7 @@ class PassengerStatusAggregator
   private
 
   def run
-    app_hostnames.each do |hostname|
+    @app_hostnames.each do |hostname|
       collect_stats(hostname)
     end
   end
@@ -37,11 +37,11 @@ class PassengerStatusAggregator
   # inactive = 2
   # Waiting on global queue: 5
   def parse_output(output)
-    @stats[:max] = output.match(/max\s+=\s+(\d+)/)
-    @stats[:booted] = output.match(/count\s+=\s+(\d+)/)
-    @stats[:active] = output.match(/active\s+=\s+(\d+)/)
-    @stats[:inactive] = output.match(/inactive\s+=\s+(\d+)/)
-    @stats[:queued] = output.match(/Waiting on global queue:\s+(\d+)/)
+    @stats[:max] += output.match(/max\s+=\s+(\d+)/)[1].to_i
+    @stats[:booted] += output.match(/count\s+=\s+(\d+)/)[1].to_i
+    @stats[:active] += output.match(/active\s+=\s+(\d+)/)[1].to_i
+    @stats[:inactive] += output.match(/inactive\s+=\s+(\d+)/)[1].to_i
+    @stats[:queued] += output.match(/Waiting on global queue:\s+(\d+)/)[1].to_i
   end
 
 end

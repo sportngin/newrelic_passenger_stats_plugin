@@ -5,6 +5,8 @@ require "bundler/setup"
 
 require "newrelic_plugin"
 
+require File.join(File.dirname(__FILE__), 'lib/passenger_status_aggregator')
+
 module PassengerStatsAgent
 
   class Agent < NewRelic::Plugin::Agent::Base
@@ -22,7 +24,6 @@ module PassengerStatsAgent
       options = {
         :ssh_command => ssh_command,
         :passenger_status_command => passenger_status_command,
-        :passenger_memory_stats_command => passenger_memory_stats_command,
         :app_hostnames => app_hostnames,
       }
       aggregator = PassengerStatusAggregator.new(options)
@@ -31,7 +32,7 @@ module PassengerStatsAgent
 
     private
 
-    def record_passenger_status_metrics(stats)
+    def record_passenger_status_metrics(aggregator)
       report_metric "passenger.processes.max", "Processes", aggregator.stats[:max]
       report_metric "passenger.processes.booted", "Processes", aggregator.stats[:booted]
       report_metric "passenger.processes.active", "Processes", aggregator.stats[:active]

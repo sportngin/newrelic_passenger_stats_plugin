@@ -16,7 +16,7 @@ newrelic:
 # Agent Configuration:
 #
 agents:
-  example:
+  passenger_stats:
     app_name: my_app
     ssh_command: ssh -l username
     passenger_status_command: passenger-status
