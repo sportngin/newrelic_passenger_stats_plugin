@@ -33,10 +33,11 @@ module PassengerStatsAgent
     private
 
     def record_passenger_status_metrics(aggregator)
-      report_metric "passenger.processes.max", "Processes", aggregator.stats[:max]
-      report_metric "passenger.processes.booted", "Processes", aggregator.stats[:booted]
-      report_metric "passenger.processes.active", "Processes", aggregator.stats[:active]
-      report_metric "passenger.queue.waiting", "Requests", aggregator.stats[:queued]
+      report_metric "passenger_stats.processes.max", "Processes", aggregator.stats[:max]
+      report_metric "passenger_stats.processes.booted", "Processes", aggregator.stats[:booted]
+      report_metric "passenger_stats.processes.active", "Processes", aggregator.stats[:active]
+      report_metric "passenger_stats.queue.waiting", "Requests", aggregator.stats[:queued]
+      report_metric "passenger_stats.aggregate.capacity", "Capacity", aggregator.stats[:active] / aggregator.stats[:max]
     end
 
   end
