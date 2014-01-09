@@ -1,3 +1,5 @@
+require 'timeout'
+
 class PassengerStatusAggregator
 
   attr_accessor :stats
@@ -18,15 +20,25 @@ class PassengerStatusAggregator
 
   private
 
+  def app_hostnames
+    YAML.load_file("config/newrelic_plugin.yml")["agents"]["passenger_stats"]["app_hostnames"]
+  end
+
   def run
-    @app_hostnames.each do |hostname|
+    app_hostnames.each do |hostname|
       collect_stats(hostname)
     end
   end
 
   def collect_stats(hostname)
-    output = `#{@ssh_command} #{hostname} '#{@passenger_status_command}'`
-    parse_output(output)
+    begin
+      Timeout::timeout(10) do
+        output = `#{@ssh_command} #{hostname} '#{@passenger_status_command}'`
+      end
+      parse_output(output)
+    rescue StandardError
+      # continue on if we get an error
+    end
   end
 
   # Example output from passenger-status:
