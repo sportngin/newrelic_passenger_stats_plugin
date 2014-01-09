@@ -18,6 +18,14 @@ class PassengerStatusAggregator
     run
   end
 
+  def percent_capacity
+    if @stats[:max] > 0
+      @stats[:active] / @stats[:max] * 100
+    else
+      0
+    end
+  end
+
   private
 
   def app_hostnames
@@ -34,8 +42,8 @@ class PassengerStatusAggregator
     begin
       Timeout::timeout(10) do
         output = `#{@ssh_command} #{hostname} '#{@passenger_status_command}'`
+        parse_output(output)
       end
-      parse_output(output)
     rescue StandardError
       # continue on if we get an error
     end
