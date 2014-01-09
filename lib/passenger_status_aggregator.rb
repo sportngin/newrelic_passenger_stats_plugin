@@ -20,7 +20,7 @@ class PassengerStatusAggregator
 
   def percent_capacity
     if @stats[:max] > 0
-      @stats[:active] / @stats[:max] * 100
+      @stats[:active].to_f / @stats[:max].to_f * 100
     else
       0
     end
