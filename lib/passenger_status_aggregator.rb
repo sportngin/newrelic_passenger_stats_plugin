@@ -1,32 +1,16 @@
 require 'timeout'
+require 'passenger_status_parser'
 
 class PassengerStatusAggregator
 
   attr_accessor :stats
 
   def initialize(options)
-    @stats = {
-      :max => 0,
-      :booted => 0,
-      :active => 0,
-      :inactive => 0,
-      :queued => 0,
-    }
+    @stats = {}
     @ssh_command = options[:ssh_command]
     @app_hostnames = options[:app_hostnames]
     @passenger_status_command = options[:passenger_status_command]
-    run
   end
-
-  def percent_capacity
-    if @stats[:max] > 0
-      @stats[:active].to_f / @stats[:max].to_f * 100
-    else
-      0
-    end
-  end
-
-  private
 
   def app_hostnames
     YAML.load_file("config/newrelic_plugin.yml")["agents"]["passenger_stats"]["app_hostnames"]
@@ -42,26 +26,46 @@ class PassengerStatusAggregator
     begin
       Timeout::timeout(10) do
         output = `#{@ssh_command} #{hostname} '#{@passenger_status_command}'`
-        parse_output(output)
+        parse_output(hostname,output)
       end
     rescue StandardError
       # continue on if we get an error
     end
   end
-
-  # Example output from passenger-status:
-  # ----------- General information -----------
-  # max      = 8
-  # count    = 6
-  # active   = 4
-  # inactive = 2
-  # Waiting on global queue: 5
-  def parse_output(output)
-    @stats[:max] += output.match(/max\s+=\s+(\d+)/)[1].to_i
-    @stats[:booted] += output.match(/count\s+=\s+(\d+)/)[1].to_i
-    @stats[:active] += output.match(/active\s+=\s+(\d+)/)[1].to_i
-    @stats[:inactive] += output.match(/inactive\s+=\s+(\d+)/)[1].to_i
-    @stats[:queued] += output.match(/Waiting on global queue:\s+(\d+)/)[1].to_i
+  
+  def parse_output(hostname,output)
+    @stats[hostname] = PassengerStatusParser.new(output).to_hash
   end
 
+  def capacity
+    if max > 0
+      active.to_f / max.to_f * 100
+    else
+      0
+    end
+  end
+
+  def max
+    stats.map{|host,stats| stats[:max]}.reduce(:+) 
+  end
+
+  def active
+    stats.map{|host,stats| stats[:active]}.reduce(:+)
+  end
+
+  def booted
+    stats.map{|host,stats| stats[:booted]}.reduce(:+)
+  end
+
+  def queued
+    stats.map{|host,stats| stats[:queued]}.reduce(:+)
+  end
+
+  def cpu
+    stats.map{|host,stats| stats[:cpu]}.reduce(:+) / stats.keys.count
+  end
+
+  def memory
+    stats.map{|host,stats| stats[:memory]}.reduce(:+) / stats.keys.count
+  end
 end

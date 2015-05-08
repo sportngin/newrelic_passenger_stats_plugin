@@ -1,3 +1,7 @@
 source "http://rubygems.org"
 gem "newrelic_plugin"
-gem "passenger", "~> 3.0.0"
+gem "passenger"
+
+group :test, :development do
+  gem "rspec"
+end

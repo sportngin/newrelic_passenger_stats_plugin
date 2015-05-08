@@ -2,7 +2,6 @@
 
 require "rubygems"
 require "bundler/setup"
-
 require "newrelic_plugin"
 
 require File.join(File.dirname(__FILE__), 'lib/passenger_status_aggregator')
@@ -12,7 +11,7 @@ module PassengerStatsAgent
   class Agent < NewRelic::Plugin::Agent::Base
 
     agent_guid "com.sportngin.passenger-stats-agent"
-    agent_version "0.0.4"
+    agent_version "0.1.0"
     agent_config_options :app_name, :ssh_command, :passenger_status_command, :app_hostnames
     agent_human_labels("Passenger Stats") { "Passenger Stats for #{app_name}" }
 
@@ -25,18 +24,20 @@ module PassengerStatsAgent
         :ssh_command => ssh_command,
         :passenger_status_command => passenger_status_command,
       }
-      aggregator = PassengerStatusAggregator.new(options)
+      aggregator = PassengerStatusAggregator.new(options).run
       record_passenger_status_metrics(aggregator)
     end
 
     private
 
     def record_passenger_status_metrics(aggregator)
-      report_metric "passenger_stats.processes.max", "Processes", aggregator.stats[:max]
-      report_metric "passenger_stats.processes.booted", "Processes", aggregator.stats[:booted]
-      report_metric "passenger_stats.processes.active", "Processes", aggregator.stats[:active]
-      report_metric "passenger_stats.queue.waiting", "Requests", aggregator.stats[:queued]
-      report_metric "passenger_stats.aggregate.capacity", "Capacity", aggregator.percent_capacity
+      report_metric "passenger_stats.aggregate.max", "Processes", aggregator.max
+      report_metric "passenger_stats.aggregate.booted", "Processes", aggregator.booted
+      report_metric "passenger_stats.aggregate.active", "Processes", aggregator.active
+      report_metric "passenger_stats.aggregate.queued", "Requests", aggregator.queued
+      report_metric "passenger_stats.aggregate.capacity", "Percent", aggregator.capacity
+      report_metric "passenger_stats.aggregate.cpu", "Percent", aggregator.cpu
+      report_metric "passenger_stats.aggregate.memory", "Megabytes", aggregator.memory
     end
 
   end
