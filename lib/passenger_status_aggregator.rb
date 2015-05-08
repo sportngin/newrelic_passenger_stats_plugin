@@ -1,4 +1,5 @@
 require 'timeout'
+require 'passenger_status_parser'
 
 class PassengerStatusAggregator
 
@@ -15,18 +16,7 @@ class PassengerStatusAggregator
     @ssh_command = options[:ssh_command]
     @app_hostnames = options[:app_hostnames]
     @passenger_status_command = options[:passenger_status_command]
-    run
   end
-
-  def percent_capacity
-    if @stats[:max] > 0
-      @stats[:active].to_f / @stats[:max].to_f * 100
-    else
-      0
-    end
-  end
-
-  private
 
   def app_hostnames
     YAML.load_file("config/newrelic_plugin.yml")["agents"]["passenger_stats"]["app_hostnames"]
@@ -49,19 +39,21 @@ class PassengerStatusAggregator
     end
   end
 
-  # Example output from passenger-status:
-  # ----------- General information -----------
-  # max      = 8
-  # count    = 6
-  # active   = 4
-  # inactive = 2
-  # Waiting on global queue: 5
+  def capacity
+    if @stats[:max] > 0
+      @stats[:active].to_f / @stats[:max].to_f * 100
+    else
+      0
+    end
+  end
+
   def parse_output(output)
-    @stats[:max] += output.match(/max\s+=\s+(\d+)/)[1].to_i
-    @stats[:booted] += output.match(/count\s+=\s+(\d+)/)[1].to_i
-    @stats[:active] += output.match(/active\s+=\s+(\d+)/)[1].to_i
-    @stats[:inactive] += output.match(/inactive\s+=\s+(\d+)/)[1].to_i
-    @stats[:queued] += output.match(/Waiting on global queue:\s+(\d+)/)[1].to_i
+    parsed = PassengerStatusParser.new(output)
+    @stats[:active] += parsed.active
+    @stats[:inactive] += parsed.inactive
+    @stats[:max] += parsed.max
+    @stats[:booted] += parsed.booted
+    @stats[:queued] += parsed.queued
   end
 
 end
