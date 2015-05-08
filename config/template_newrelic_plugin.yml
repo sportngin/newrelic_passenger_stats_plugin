@@ -21,7 +21,7 @@ agents:
     ssh_command: ssh -l username
     passenger_status_command: passenger-status
     # the hostnames for your app instances
-    # - the agent will ssh into these to run `passenger-status` and `passenger-memory-stats`
+    # - the agent will ssh into these to run `passenger-status`
     app_hostnames:
       - foo1.bar.com
       - foo2.bar.com

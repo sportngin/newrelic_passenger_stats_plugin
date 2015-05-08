@@ -26,7 +26,7 @@ Instance: qHjiiRNe (nginx/1.8.0 Phusion_Passenger/5.0.7)
 
 ----------- General information -----------
 Max pool size : 2
-Processes     : 1
+Processes     : 2
 Requests in top-level queue : 0
 
 ----------- Application groups -----------

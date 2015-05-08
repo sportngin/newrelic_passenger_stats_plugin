@@ -39,4 +39,28 @@ class PassengerStatusParser
     queued ? queued[1].to_i : 0
   end
 
+  def memory
+    if memory = output.scan(/Memory\s\s:\s+(\d+)/).flatten.map(&:to_i).reduce(:+)
+      memory.to_f/booted.to_f
+    else
+      0.0
+    end
+  end
+
+  def cpu
+    if cpu = output.scan(/CPU:\s+(\d+)/).flatten.map(&:to_i).reduce(:+)
+      cpu.to_f/booted.to_f
+    else
+      0.0
+    end
+  end
+
+  def to_hash
+    parsed = {
+      :active => active, :inactive => inactive,
+      :max => max, :booted => booted, :queued => queued,
+      :memory => memory, :cpu => cpu
+    }
+  end
+
 end

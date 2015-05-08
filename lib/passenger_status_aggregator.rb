@@ -6,13 +6,7 @@ class PassengerStatusAggregator
   attr_accessor :stats
 
   def initialize(options)
-    @stats = {
-      :max => 0,
-      :booted => 0,
-      :active => 0,
-      :inactive => 0,
-      :queued => 0,
-    }
+    @stats = {}
     @ssh_command = options[:ssh_command]
     @app_hostnames = options[:app_hostnames]
     @passenger_status_command = options[:passenger_status_command]
@@ -32,28 +26,46 @@ class PassengerStatusAggregator
     begin
       Timeout::timeout(10) do
         output = `#{@ssh_command} #{hostname} '#{@passenger_status_command}'`
-        parse_output(output)
+        parse_output(hostname,output)
       end
     rescue StandardError
       # continue on if we get an error
     end
   end
+  
+  def parse_output(hostname,output)
+    @stats[hostname] = PassengerStatusParser.new(output).to_hash
+  end
 
   def capacity
-    if @stats[:max] > 0
-      @stats[:active].to_f / @stats[:max].to_f * 100
+    if max > 0
+      active.to_f / max.to_f * 100
     else
       0
     end
   end
 
-  def parse_output(output)
-    parsed = PassengerStatusParser.new(output)
-    @stats[:active] += parsed.active
-    @stats[:inactive] += parsed.inactive
-    @stats[:max] += parsed.max
-    @stats[:booted] += parsed.booted
-    @stats[:queued] += parsed.queued
+  def max
+    stats.map{|host,stats| stats[:max]}.reduce(:+) 
   end
 
+  def active
+    stats.map{|host,stats| stats[:active]}.reduce(:+)
+  end
+
+  def booted
+    stats.map{|host,stats| stats[:booted]}.reduce(:+)
+  end
+
+  def queued
+    stats.map{|host,stats| stats[:queued]}.reduce(:+)
+  end
+
+  def cpu
+    stats.map{|host,stats| stats[:cpu]}.reduce(:+)
+  end
+
+  def memory
+    stats.map{|host,stats| stats[:memory]}.reduce(:+)
+  end
 end

@@ -37,6 +37,30 @@ describe PassengerStatusParser do
       end
     end
 
+    context "#cpu" do
+      it "returns the right value" do
+        expect(subject.cpu).to eq(0.0)
+      end
+    end
+
+    context "#memory" do
+      it "returns the right value" do 
+        expect(subject.memory).to eq(0.0)
+      end
+    end
+
+    context "#to_hash" do 
+      let (:parsed) do 
+        {
+          :active => 0, :inactive => 4,
+          :max => 4, :booted => 4, :queued => 0,
+          :memory => 0.0, :cpu => 0.0
+        }
+      end
+      it "returns the right value" do 
+        expect(subject.to_hash).to eq(parsed)
+      end
+    end
   end
 
   context "Passenger 5" do
@@ -49,7 +73,7 @@ describe PassengerStatusParser do
 
     context "#inactive" do
       it "returns the right value" do
-        expect(subject.inactive).to eq(0)
+        expect(subject.inactive).to eq(1)
       end
     end
 
@@ -61,13 +85,38 @@ describe PassengerStatusParser do
 
     context "#booted" do
       it "returns the right value" do
-        expect(subject.booted).to eq(1)
+        expect(subject.booted).to eq(2)
       end
     end
 
     context "#queued" do
       it "returns the right value" do
         expect(subject.queued).to eq(3)
+      end
+    end
+
+    context "#cpu" do
+      it "returns the right value" do
+        expect(subject.cpu).to eq(1.0)
+      end
+    end
+
+    context "#memory" do
+      it "returns the right value" do 
+        expect(subject.memory).to eq(42.5)
+      end
+    end
+
+    context "#to_hash" do 
+      let (:parsed) do 
+        {
+          :active => 1, :inactive => 1,
+          :max => 2, :booted => 2, :queued => 3,
+          :memory => 42.5, :cpu => 1.0
+        }
+      end
+      it "returns the right value" do 
+        expect(subject.to_hash).to eq(parsed)
       end
     end
   end
