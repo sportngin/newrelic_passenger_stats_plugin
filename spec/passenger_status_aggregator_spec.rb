@@ -64,4 +64,52 @@ describe PassengerStatusAggregator do
     end
   end
 
+  context "results" do
+    subject {PassengerStatusAggregator.new(options)}
+    before do
+      subject.stats["foo1.bar.com"] = {
+        :max => 10,
+        :active => 4,
+        :booted => 6,
+        :queued => 0,
+        :cpu => 4.0,
+        :memory => 100
+      }
+      subject.stats["foo2.bar.com"] = {
+        :max => 10,
+        :active => 4,
+        :booted => 6,
+        :queued => 10,
+        :cpu => 1.0,
+        :memory => 40
+      }
+    end
+
+    context "#max" do
+      it "gets the correct result" do
+        expect(subject.max).to eq(20)
+      end
+    end
+    context "#active" do
+      it "gets the correct result" do
+        expect(subject.active).to eq(8)
+      end
+    end
+    context "#queued" do
+      it "gets the correct result" do
+        expect(subject.queued).to eq(10)
+      end
+    end
+    context "#cpu" do
+      it "gets the correct result" do
+        expect(subject.cpu).to eq(2.5)
+      end
+    end
+    context "#memory" do
+      it "gets the correct result" do
+        expect(subject.memory).to eq(70)
+      end
+    end
+  end
+
 end

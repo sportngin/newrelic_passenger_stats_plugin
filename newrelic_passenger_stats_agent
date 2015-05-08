@@ -31,11 +31,13 @@ module PassengerStatsAgent
     private
 
     def record_passenger_status_metrics(aggregator)
-      report_metric "passenger_stats.processes.max", "Processes", aggregator.max
-      report_metric "passenger_stats.processes.booted", "Processes", aggregator.booted
-      report_metric "passenger_stats.processes.active", "Processes", aggregator.active
-      report_metric "passenger_stats.queue.waiting", "Requests", aggregator.queued
-      report_metric "passenger_stats.aggregate.capacity", "Capacity", aggregator.capacity
+      report_metric "passenger_stats.aggregate.max", "Processes", aggregator.max
+      report_metric "passenger_stats.aggregate.booted", "Processes", aggregator.booted
+      report_metric "passenger_stats.aggregate.active", "Processes", aggregator.active
+      report_metric "passenger_stats.aggregate.queued", "Requests", aggregator.queued
+      report_metric "passenger_stats.aggregate.capacity", "Percent", aggregator.capacity
+      report_metric "passenger_stats.aggregate.cpu", "Percent", aggregator.cpu
+      report_metric "passenger_stats.aggregate.memory", "Megabytes", aggregator.memory
     end
 
   end

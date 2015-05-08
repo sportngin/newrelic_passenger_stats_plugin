@@ -62,10 +62,10 @@ class PassengerStatusAggregator
   end
 
   def cpu
-    stats.map{|host,stats| stats[:cpu]}.reduce(:+)
+    stats.map{|host,stats| stats[:cpu]}.reduce(:+) / stats.keys.count
   end
 
   def memory
-    stats.map{|host,stats| stats[:memory]}.reduce(:+)
+    stats.map{|host,stats| stats[:memory]}.reduce(:+) / stats.keys.count
   end
 end
