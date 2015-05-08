@@ -3,15 +3,15 @@
 require "rubygems"
 require "bundler/setup"
 require "newrelic_plugin"
-require File.join(File.dirname(__FILE__), 'lib/passenger_status_aggregator')
 require File.join(File.dirname(__FILE__), 'lib/passenger_status_parser')
+require File.join(File.dirname(__FILE__), 'lib/passenger_status_aggregator')
 
 module PassengerStatsAgent
 
   class Agent < NewRelic::Plugin::Agent::Base
 
     agent_guid "com.sportngin.passenger-stats-agent"
-    agent_version "0.1.0"
+    agent_version "0.1.1"
     agent_config_options :app_name, :ssh_command, :passenger_status_command, :app_hostnames
     agent_human_labels("Passenger Stats") { "Passenger Stats for #{app_name}" }
 

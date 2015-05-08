@@ -1,5 +1,5 @@
 require 'timeout'
-require 'passenger_status_parser'
+require_relative 'passenger_status_parser'
 
 class PassengerStatusAggregator
 
