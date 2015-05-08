@@ -3,8 +3,8 @@
 require "rubygems"
 require "bundler/setup"
 require "newrelic_plugin"
-
 require File.join(File.dirname(__FILE__), 'lib/passenger_status_aggregator')
+require File.join(File.dirname(__FILE__), 'lib/passenger_status_parser')
 
 module PassengerStatsAgent
 
