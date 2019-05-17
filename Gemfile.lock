@@ -28,7 +28,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  json (= 2.2.0)
+  json (~> 2.2.0)
   newrelic_plugin
   passenger
   rspec
