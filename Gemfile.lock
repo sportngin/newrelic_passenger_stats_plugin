@@ -2,7 +2,7 @@ GEM
   remote: http://rubygems.org/
   specs:
     diff-lcs (1.2.5)
-    json (1.8.2)
+    json (2.2.0)
     newrelic_plugin (1.3.1)
       json
     passenger (5.0.7)
@@ -28,6 +28,10 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  json (~> 2.2.0)
   newrelic_plugin
   passenger
   rspec
+
+BUNDLED WITH
+   1.17.2
